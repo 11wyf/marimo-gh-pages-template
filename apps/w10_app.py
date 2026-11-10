@@ -7,7 +7,10 @@ app = marimo.App(width="medium")
 @app.cell
 def _():
     import pandas as pd
-    df=pd.read_csv('market_returns.csv',parse_dates=['date']) #指定 date 列转为 pandas 时间格式
+    import marimo as mo
+    # mo.notebook_location() 能自动获取当前环境下的正确路径
+    data_path = mo.notebook_location() / "public" / "market_returns.csv"
+    df=pd.read_csv(data_path,parse_dates=['date']) #指定 date 列转为 pandas 时间格式
     df.head()
     return (df,)
 
