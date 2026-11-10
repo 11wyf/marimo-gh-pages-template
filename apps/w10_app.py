@@ -11,19 +11,16 @@ def _():
     # mo.notebook_location() 能自动获取当前环境下的正确路径
     data_path = mo.notebook_location() / "public" / "market_returns.csv"
     df=pd.read_csv(data_path,parse_dates=['date']) #指定 date 列转为 pandas 时间格式
-    df.head()
-    return (df,)
+    
+    return df, mo, pd
 
 
 @app.cell
-def _():
-    import marimo as mo
+def _(mo):
     # 调用 marimo 的用户界面（UI）库，创建一个滑块。
     # 定义这个滑块控件，范围是 2 到 60 个月，默认值是 20
     window_slider = mo.ui.slider(start=2, stop=60, value=20, label="滑动窗口 (月): ")
 
-    # 显示这个滑块（在 marimo 中，最后一行只写变量名就会显示控件）
-    window_slider
 
     # 创建资产选择下拉菜单
     asset_selector=mo.ui.dropdown(
@@ -31,7 +28,6 @@ def _():
         value="asset_a",
         label='选择资产'
     )
-    asset_selector,window_slider
     return asset_selector, window_slider
 
 
@@ -45,7 +41,7 @@ def _(asset_selector, df, window_slider):
 
 
 @app.cell
-def _(asset_selector, vol_series, window_slider):
+def _(asset_selector, mo, vol_series, window_slider):
     import matplotlib.pyplot as plt
     fig, ax = plt.subplots(figsize=(10, 4))
     # 画折线图：X轴是时间（索引），Y轴是波动率
@@ -58,13 +54,10 @@ def _(asset_selector, vol_series, window_slider):
 
     # 为了美观，自动调整日期标签的角度
     fig.autofmt_xdate()
-    fig,window_slider,asset_selector
-    return
+    # 使用 marimo 的专属包装器让图表在网页端稳定渲染，并 return 出去
+    chart = mo.ui.matplotlib(fig)
+    return (chart,)
 
-
-@app.cell
-def _():
-    return
 
 
 if __name__ == "__main__":
